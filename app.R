@@ -1,13 +1,23 @@
 
 
 library(shiny)
-
-library(formattable)
+library(tidyverse)
 library(plotly)
 library(shinycssloaders)
+library(formattable)
 
-devtools::install_github("Appsilon/shiny.semantic@develop")
+
+devtools::install_github("rosseji/shiny.semantic@develop")
 library(shiny.semantic)
+
+
+
+devtools::install_github("trendlock/SAFEnote")
+library(SAFEnote)
+
+
+
+
 
 
 
