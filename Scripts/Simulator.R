@@ -7,7 +7,7 @@ SAFE.Investment <- 50000
 
 #### Adjustable Inputs
 Cap <- 2000000
-Existing.no.shareholders <- 3
+Existing.no.shareholders <- 2
 Existing.no.shares.issued <- 1000
 Pre.cash.valuation <- 1000000
 New.Investment <- 250000
@@ -23,9 +23,9 @@ price.per.share <- Pre.cash.valuation/Existing.no.shares.issued
 shares.issued <- New.Investment/price.per.share
 SAFE.triggered <- if_else(New.Investment >= Threshold, TRUE, FALSE)
 Discount.Price <- price.per.share*(1-Discount)
-SAFE.Price <- Pre.cash.valuation/Existing.no.shares.issued
+SAFE.Price <- Cap/Existing.no.shares.issued
 Cap.triggered <- if_else(SAFE.Investment/SAFE.Price > SAFE.Investment/Discount.Price, TRUE, FALSE)
-Westpac.Shares <- round(max(SAFE.Investment/Discount.Price, SAFE.Investment/SAFE.Price))
+Westpac.Shares <- round(max(SAFE.Investment/Discount.Price, SAFE.Investment/SAFE.Price))*SAFE.triggered
 Total.Shares.Post.Raise <- sum(preraise_table$shares) + shares.issued + Westpac.Shares
 
 ##### Building basic df for New Investor  #####
