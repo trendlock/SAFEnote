@@ -23,7 +23,10 @@ price.per.share <- Pre.cash.valuation/Existing.no.shares.issued
 shares.issued <- New.Investment/price.per.share
 SAFE.triggered <- if_else(New.Investment >= Threshold, TRUE, FALSE)
 Discount.Price <- price.per.share*(1-Discount)
-SAFE.Price <- Pre.cash.valuation/Existing.no.shares.issued
+
+
+SAFE.Price <- Pre.cash.valuation/(Cap/Existing.no.shares.issued)
+
 Cap.triggered <- if_else(SAFE.Investment/SAFE.Price > SAFE.Investment/Discount.Price, TRUE, FALSE)
 Westpac.Shares <- round(max(SAFE.Investment/Discount.Price, SAFE.Investment/SAFE.Price))
 Total.Shares.Post.Raise <- sum(preraise_table$shares) + shares.issued + Westpac.Shares
