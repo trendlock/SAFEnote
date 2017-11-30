@@ -48,10 +48,10 @@ ui <- fluidPage(
             uisegment(
               div(class = "ui horizontal divider", uiicon("tag"), "Adjustable Inputs"),
               sliderInput("Cap", "Cap", min = 0, max = 10, value = 2, pre = "$", post = "M"),
-              sliderInput("Existing.no.shareholders", "Existing No of Shareholders", min = 0, max = 10, value = 3, post = " Shareholders"),
-              sliderInput("Existing.no.shares.issued", "Existing No of Shares Issued", min = 0, max = 10000, value = 1000, post = " Shares"),
-              sliderInput("Pre.cash.valuation", "Pre Cash Valuation", min = 0, max = 10, value = 1, step = 0.25, pre = "$", post = "M"),
-              sliderInput("New.Investment", "New Investment", min = 0, max = 5, value = .25, step = 0.25, pre = "$", post = "M")
+              sliderInput("Existing.no.shareholders", "Existing No of Shareholders", min = 0, max = 8, value = 3, post = " Shareholders"),
+              sliderInput("Existing.no.shares.issued", "Existing No of Shares Issued", min = 0, max = 1000000, value = 1000, post = " Shares"),
+              sliderInput("Pre.cash.valuation", "Pre Cash Valuation", min = 0, max = 10, value = 1, step = 0.1, pre = "$", post = "M"),
+              sliderInput("New.Investment", "New Investment", min = 0, max = 4, value = .25, step = 0.05, pre = "$", post = "M")
 
               )
             ),
@@ -102,28 +102,29 @@ server <- function(input, output) {
 
     #### A few more calcs #########
     price.per.share <- Pre.cash.valuation/Existing.no.shares.issued
-    shares.issued <- New.Investment/price.per.share
+    shares.issued <- round(New.Investment/price.per.share)
     SAFE.triggered <- if_else(New.Investment >= Threshold, TRUE, FALSE)
     Discount.Price <- price.per.share*(1-Discount)
-    SAFE.Price <- Pre.cash.valuation/(Cap/Existing.no.shares.issued)
+    SAFE.Price <- Cap/Existing.no.shares.issued
     Cap.triggered <- if_else(SAFE.Investment/SAFE.Price > SAFE.Investment/Discount.Price, TRUE, FALSE)
-    Westpac.Shares <- round(max(SAFE.Investment/Discount.Price, SAFE.Investment/SAFE.Price))
+    Westpac.Shares <- round(max(SAFE.Investment/Discount.Price, SAFE.Investment/SAFE.Price))*SAFE.triggered
     Total.Shares.Post.Raise <- sum(preraise_table$shares) + shares.issued + Westpac.Shares
 
     ls <- list(
-      list(name = "Cap",  val = Cap),
-      list(name = "Existing.no.shareholders",  val = Existing.no.shareholders),
-      list(name = "Existing.no.shares.issued",  val = Existing.no.shares.issued),
-      list(name = "Pre.cash.valuation",  val = Pre.cash.valuation),
-      list(name = "New.Investment",  val = New.Investment),
-      list(name = "price.per.share",  val = price.per.share),
-      list(name = "shares.issued",  val = shares.issued),
-      list(name = "SAFE.triggered",  val = SAFE.triggered),
-      list(name = "Discount.Price",  val = Discount.Price),
-      list(name = "SAFE.Price",  val = SAFE.Price),
-      list(name = "Cap.triggered",  val = Cap.triggered),
-      list(name = "Westpac.Shares",  val = Westpac.Shares),
-      list(name = "Total.Shares.Post.Raise",  val = Total.Shares.Post.Raise)
+
+      list(name = "Number of Existing Shareholders",  val = Existing.no.shareholders),
+      list(name = "Fully-diluted number of shares pre-raise",  val = Existing.no.shares.issued),
+      list(name = "Pre-Cash Valuation",  val = Pre.cash.valuation),
+      list(name = "Valuation Cap",  val = Cap),
+      list(name = "New Investment Amount",  val = New.Investment),
+      list(name = "Standard Price Per Share",  val = round(price.per.share, digits = 3)),
+      list(name = "Number of Shares issue to new investor",  val = shares.issued),
+      list(name = "Was the SAFE note triggered?",  val = SAFE.triggered),
+      list(name = "Discounted Share Price",  val = round(Discount.Price, digits = 3)),
+      list(name = "SAFE Price (from Cap)",  val = round(SAFE.Price, digits = 3)),
+      list(name = "Was the Cap triggered?",  val = Cap.triggered),
+      list(name = "Number of Shares Issued to Westpac",  val = Westpac.Shares),
+      list(name = "Total Shares on Issued post-raise",  val = Total.Shares.Post.Raise)
     )
 
     output$inputs_tbl <-  renderFormattable({
